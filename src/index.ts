@@ -1,34 +1,33 @@
-// eslint-disable no-console 
+// eslint-disable no-console
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import swaggerJsDoc from 'swagger-jsdoc';
 import { StatusCodes } from 'http-status-codes';
 import { responseValidation } from './lib';
 import express, { Request, Response } from 'express'; // NextFunction,
-import http from "http";
+import http from 'http';
 import helmet from 'helmet';
 import logger from './lib/logger';
-import swaggerUi from 'swagger-ui-express'
+import swaggerUi from 'swagger-ui-express';
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
 import userRouter from './routes/user';
-import axios from 'axios'
-dotenv.config()
+import axios from 'axios';
+dotenv.config();
 const app = express();
 
 const server = new http.Server(app);
 
-// add database connection 
+// add database connection
 
 app.use(cors());
 // const io = new Server(server,{cors: {origin: "*"}});
 app.use(helmet());
-app.use(bodyParser.json());  
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   try {
-
     // set header for swagger.
     res.setHeader(
       'Content-Security-Policy',
@@ -46,7 +45,7 @@ app.use((req, res, next) => {
       reference: ${req.headers.referer} , 
       user-agent: ${req.headers['user-agent']}
       ------------ End ------------  `,
-    );               
+    );
   } catch (error) {
     logger.error(`error while printing caller info path: ${req.path}`);
   }
@@ -98,20 +97,19 @@ app.use(
   swaggerUi.setup(specs),
 );
 
-
 const health = (req: Request, res: Response) => {
- const users =  [
-  {
-    name:"dipak",
-    age:36
-  },
-  {
-    name:"dipak",
-    age:18
-  }
- ]
- const a = users.filter(user=> user.age > 18)
- console.log("a:=================",a)
+  const users = [
+    {
+      name: 'dipak',
+      age: 36,
+    },
+    {
+      name: 'dipak',
+      age: 18,
+    },
+  ];
+  const a = users.filter((user) => user.age > 18);
+  console.log('a:=================', a);
   res.json({
     message: 'lets-get-lunch server is working',
     env: process.env.NODE_ENV,
@@ -156,7 +154,7 @@ app.get('/', health);
  *       500:
  *         description: Something went wrong, please try again later.
  */
-app.use('/api/user',userRouter)
+app.use('/api/user', userRouter);
 app.get('/api/health', health);
 
 app.use((req: Request, res: Response) => {
@@ -190,11 +188,12 @@ const queryParams = {
   sellerId: '3f17602e0bef4b64',
 };
 
-axios.get(apiEndpoint, { params: queryParams })
-  .then(response => {
+axios
+  .get(apiEndpoint, { params: queryParams })
+  .then((response) => {
     console.log(response.data);
   })
-  .catch(error => {
+  .catch((error) => {
     if (error.response) {
       // The request was made and the server responded with a status code
       console.error('Server responded with status:', error.response.status);
@@ -213,4 +212,3 @@ process.on('unhandledRejection', function (reason, promise) {
 });
 
 export default server;
-

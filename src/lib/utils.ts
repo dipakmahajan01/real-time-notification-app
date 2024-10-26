@@ -74,7 +74,7 @@ export function responseValidation(responseStatusCode?: number, responseStatusMs
   } else {
     responseValidationJson.response_error = responseErrors;
   }
-  return responseValidationJson;    
+  return responseValidationJson;
 }
 
 export const generateOTP = function (otpLength = 6) {

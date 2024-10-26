@@ -1,6 +1,2 @@
-/.next
-/node_modules
-src/*.jsx
-src/*.tsx
-
-# **ui/**
+node_modules/**
+!.eslintrc.js
