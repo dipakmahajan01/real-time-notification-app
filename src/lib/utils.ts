@@ -29,41 +29,6 @@ export function responseGenerators(
   return responseJson;
 }
 
-export const logDateFormat = () => {
-  return 'DD-MM-YYYY';
-};
-
-export const DateFormat = () => {
-  // return only date ex:2021-11-25 00:00:00
-  return 'YYYY-MM-DD 00:00:00';
-};
-
-export function weekNumberFormat() {
-  // return only digit ex:0-6 sunday as 0
-  return 'd';
-}
-
-export function yearlyFormat() {
-  // return only DD-MM
-  return 'DD-MM';
-}
-
-export function dateFormat() {
-  return 'YYYY-MM-DD HH:mm:ss';
-}
-
-export function timeFormat() {
-  return 'HH:mm:00';
-}
-
-export function dayFormat() {
-  return 'dddd';
-}
-
-export function DDMMYYYYFormat() {
-  return 'DD-MM-YYYY';
-}
-
 export function responseValidation(responseStatusCode?: number, responseStatusMsg?: string, responseErrors?: boolean) {
   const responseValidationJson: any = {};
   responseValidationJson.status_code = responseStatusCode;
@@ -77,16 +42,6 @@ export function responseValidation(responseStatusCode?: number, responseStatusMs
   return responseValidationJson;
 }
 
-export const generateOTP = function (otpLength = 6) {
-  const baseNumber = 10 ** (otpLength - 1);
-  let number = Math.floor(Math.random() * baseNumber);
-  if (number < baseNumber) {
-    number += baseNumber;
-  }
-  return number;
-};
-
-export const otpAge = parseInt(process.env.OTP_AGE as any, 10) || 3;
 
 export const logsErrorAndUrl = (req: { url: any }, error: any) => {
   const errorMessage = typeof error === 'object' ? error.message : error;

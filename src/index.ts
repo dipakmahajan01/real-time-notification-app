@@ -12,6 +12,7 @@ import { sendNotificationPubSub, socketConnection } from './socket';
 import { Server } from 'socket.io';
 import notificationRoutes from './routes/notification';
 import { createJwtToken } from './helper/validations/jwt.helper';
+import userRoutes from './routes/users';
 dotenv.config();
 const app = express();
 const server: any = createServer(app);
@@ -103,23 +104,16 @@ app.get('/', health);
  *         description: Something went wrong, please try again later.
  */
 app.use('/api/notification', notificationRoutes);
+app.use('/api/user', userRoutes);
 app.get('/api/health', health);
-app.get('/api/get-token', (req: Request, res: Response) => {
-  const jwtToken = createJwtToken({
-    user_id: '1',
-  } as any);
-  return res.status(StatusCodes.OK).send(responseGenerators(jwtToken, StatusCodes.OK, 'create token', false));
-});
 app.use((req: Request, res: Response) => {
   return res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)
     .send(responseValidation(StatusCodes.INTERNAL_SERVER_ERROR, 'No route found'));
 });
-try {
+
   socketConnection(io);
-} catch (error) {
-  console.log(error);
-}
+
 process.on('unhandledRejection', function (reason, promise) {
   logger.error('Unhandled rejection', { reason, promise });
 });

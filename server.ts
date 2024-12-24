@@ -9,9 +9,9 @@ const port = process.env.PORT || 8081;
   try {
     if ((await redisInstance.connect())) {
       removeAllUserList()
-      console.time(`⚡️ server started with 👍🏼 database connected http://localhost:${port} in `);
+      console.time(`⚡️ server started with 👍🏼 redis connected http://localhost:${port} in `);
       server.listen(port, () => {
-        console.timeEnd(`⚡️ server started with 👍🏼 database connected http://localhost:${port} in `);
+        console.timeEnd(`⚡️ server started with 👍🏼 redis connected http://localhost:${port} in `);
       });
     }
   } catch (error) {

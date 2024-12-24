@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <h1>WebSocket Client</h1>
+    <div id="messages"></div>
+    <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"
+    integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+    <script>
+      // Initialize Socket.IO client
+      const socket = io('http://localhost:8081/v1/notification', {
+        transportOptions: {
+          polling: {
+            extraHeaders: {
+              authorization:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImlhdCI6MTczNTA2MTM2NSwiZXhwIjoxNzM1MTQ3NzY1fQ.mT-KUHGQFEyoit-p_zBgazdlw0toBZ-V3wFRS41_UF4',
+            },
+          },
+        },
+      });
+
+      // Handle joining a room
+      socket.emit('join-room');
+
+      // Listen for server messages
+      socket.on('send-message', (data) => {
+        console.log("data =============",data)
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('p');
+        messageElement.textContent = `Server: ${data.message}`;
+        messagesDiv.appendChild(messageElement);
+      });
+
+      // Log connection details
+      console.log('Connected to WebSocket server');
+    </script>
+  </body>
+</html>
