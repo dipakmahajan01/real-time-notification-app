@@ -13,7 +13,6 @@ export const sendNotification = async (req: Request, res: Response) => {
     await redisInstance.client.publish(eventType, JSON.stringify({user_id: userId, event_type: eventType, data }));
     return res.status(StatusCodes.OK).send(responseGenerators({}, StatusCodes.OK, NOTIFICATION.CREATED, false));
   } catch (error) {
-    console.log("error",error)
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .send(responseGenerators({}, StatusCodes.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, true));

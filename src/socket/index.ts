@@ -9,14 +9,13 @@ export const sendNotificationPubSub = async () => {
   try {
     const subscriber = await subscribeChannel();
     await subscriber.subscribe('new_message', async (data: any) => {
-      // console.log('refreshMatchListPubSub', data);
       if (data) {
         const messageData = JSON.parse(data);
         const userData = await getUserListFromRedis();
-        const scoketId =  userData[0].socketId;
-        IO.to(scoketId).emit(
+        const socketId =  userData[0].socketId;
+        IO.to(socketId).emit(
           'send-message',
-          responseGenerators(messageData.data, StatusCodes.OK, 'send message', false),
+          responseGenerators(messageData.data, StatusCodes.OK, 'message successfully send', false),
         );
       }
     });
