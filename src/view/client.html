@@ -1,46 +1,70 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebSocket Client</title>
+    <title>Notification Client</title>
+    <!-- Add proper description and metadata -->
+    <meta name="description" content="Notification system client interface">
+    
+    <!-- Socket.IO CDN -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"
+      integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
   </head>
   <body>
-    <h1>WebSocket Client</h1>
-    <div id="messages"></div>
-    <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"
-    integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  ></script>
+    <!-- Add some UI elements for better user interaction -->
+    <div id="notification-container"></div>
+
+    <!-- Move to external JavaScript file -->
     <script>
-      // Initialize Socket.IO client
-      const socket = io('http://localhost:8081/v1/notification', {
-        transportOptions: {
-          polling: {
-            extraHeaders: {
-              authorization:
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImlhdCI6MTczNTA2MTM2NSwiZXhwIjoxNzM1MTQ3NzY1fQ.mT-KUHGQFEyoit-p_zBgazdlw0toBZ-V3wFRS41_UF4',
-            },
-          },
-        },
-      });
+      // Get token from secure source (e.g., session storage)
 
-      // Handle joining a room
-      socket.emit('join-room');
+// Initialize socket connection
+const socket = io('http://localhost:8081/v1/notification', {
+  transportOptions: {
+    polling: {
+      extraHeaders: {
+        authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImlhdCI6MTczNTA3NDAwMiwiZXhwIjoxNzM1MTYwNDAyfQ.cKYEGvIoghs-nPXt_m5qgBj3owAwJ789S4KArmSu5nw"
+      }
+    }
+  }
+});
 
-      // Listen for server messages
-      socket.on('send-message', (data) => {
-        console.log("data =============",data)
-        const messagesDiv = document.getElementById('messages');
-        const messageElement = document.createElement('p');
-        messageElement.textContent = `Server: ${data.message}`;
-        messagesDiv.appendChild(messageElement);
-      });
+// Socket event handlers
+socket.on('connect', () => {
+  console.log('Connected to notification server');
+  socket.emit('join-room');
+});
+socket.on('sendNotification', () => {
+  console.log('Connected to notification server');
+  socket.emit('join-room');
+});
 
-      // Log connection details
-      console.log('Connected to WebSocket server');
+socket.on('user-joined', (data) => {
+  console.log('Received message:', data);
+  // updateNotificationUI(data);
+});
+socket.on('send-message', (data) => {
+  console.log('Received message:', data);
+  // updateNotificationUI(data);
+});
+
+socket.on('error', (error) => {
+  console.error('Socket error:', error);
+});
+
+// UI update function
+function updateNotificationUI(data) {
+  const container = document.getElementById('notification-container');
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = data.message;
+  container.appendChild(notification);
+}
     </script>
   </body>
 </html>

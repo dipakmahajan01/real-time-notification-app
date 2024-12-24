@@ -9,23 +9,3 @@ export const subscribeChannel = async () => {
   return subscriber;
 };
 
-
-// export const refreshMatchListPubSub = async () => {
-//   try {
-//     const subscriber = await subscribeChannel();
-//     await subscriber.subscribe(USER_PUB_SUB_CHANNEL.REFRESH_UNMATCHED_LIST, async (data: any) => {
-//       // console.log('refreshMatchListPubSub', data);
-//       if (data) {
-//         const MatchData = JSON.parse(data);
-//         if (MatchData && MatchData.userId) {
-//           refreshMatchList({ userId: MatchData.userId });
-//         }
-//       }
-//     });
-//   } catch (error: any) {
-//     addCronLogs({
-//       name: 'refreshMatchListPubSub has an error.',
-//       detail: error,
-//     });
-//   }
-// };
