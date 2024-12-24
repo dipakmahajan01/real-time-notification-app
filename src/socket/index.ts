@@ -50,23 +50,7 @@ export const socketConnection = async (io: any) => {
       socket.on('sendNotification', (data) => {
         console.log('Notification data received:', data);
   
-        // Publish the data to Redis
-        // redisPublisher.publish('notifications', JSON.stringify(data));
-      });
-      // redisSubscriber.subscribe('notifications', (err) => {
-      //   if (err) {
-      //     console.error('Error subscribing to Redis channel:', err);
-      //   }
-      // });
-      // redisSubscriber.on('message', (channel, message) => {
-      //   if (channel === 'notifications') {
-      //     const notification = JSON.parse(message);
-      //     console.log('New notification:', notification);
-  
-      //     // Emit the notification to all connected WebSocket clients
-      //     io.emit('newNotification', notification);
-      //   }
-      // });
+      })
       socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);
       });

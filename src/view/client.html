@@ -18,7 +18,7 @@
   <body>
     <!-- Add some UI elements for better user interaction -->
     <div id="notification-container"></div>
-
+    <p id="dipay-text"></p>
     <!-- Move to external JavaScript file -->
     <script>
       // Get token from secure source (e.g., session storage)
@@ -49,7 +49,9 @@ socket.on('user-joined', (data) => {
   // updateNotificationUI(data);
 });
 socket.on('send-message', (data) => {
+  const dipayTextElement = document.getElementById("dipay-text");
   console.log('Received message:', data);
+  dipayTextElement.textContent = `Your payment amount is: $${data.data.message}`;
   // updateNotificationUI(data);
 });
 
