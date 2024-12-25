@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notification Client</title>
     <!-- Add proper description and metadata -->
-    <meta name="description" content="Notification system client interface">
-    
+    <meta name="description" content="Notification system client interface" />
+
     <!-- Socket.IO CDN -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"
@@ -18,55 +18,56 @@
   <body>
     <!-- Add some UI elements for better user interaction -->
     <div id="notification-container"></div>
-    <p id="dipay-text"></p>
+    <p id="dipay-text">Notification</p>
     <!-- Move to external JavaScript file -->
     <script>
       // Get token from secure source (e.g., session storage)
 
-// Initialize socket connection
-const socket = io('http://localhost:8081/v1/notification', {
-  transportOptions: {
-    polling: {
-      extraHeaders: {
-        authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImlhdCI6MTczNTA3NDAwMiwiZXhwIjoxNzM1MTYwNDAyfQ.cKYEGvIoghs-nPXt_m5qgBj3owAwJ789S4KArmSu5nw"
+      // Initialize socket connection
+      const socket = io('http://localhost:8081/v1/notification', {
+        transportOptions: {
+          polling: {
+            extraHeaders: {
+              authorization:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImlhdCI6MTczNTA3NDAwMiwiZXhwIjoxNzM1MTYwNDAyfQ.cKYEGvIoghs-nPXt_m5qgBj3owAwJ789S4KArmSu5nw',
+            },
+          },
+        },
+      });
+
+      // Socket event handlers
+      socket.on('connect', () => {
+        console.log('Connected to notification server');
+        socket.emit('join-room');
+      });
+      socket.on('sendNotification', () => {
+        console.log('Connected to notification server');
+        socket.emit('join-room');
+      });
+
+      socket.on('user-joined', (data) => {
+        console.log('Received message:', data);
+        // updateNotificationUI(data);
+      });
+      socket.on('send-message', (data) => {
+        const dipayTextElement = document.getElementById('dipay-text');
+        console.log('Received message:', data);
+        // dipayTextElement.textContent = `${data.data.message}`;
+        updateNotificationUI(data);
+      });
+
+      socket.on('error', (error) => {
+        console.error('Socket error:', error);
+      });
+
+      // UI update function
+      function updateNotificationUI(data) {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = data.data.message;
+        container.appendChild(notification);
       }
-    }
-  }
-});
-
-// Socket event handlers
-socket.on('connect', () => {
-  console.log('Connected to notification server');
-  socket.emit('join-room');
-});
-socket.on('sendNotification', () => {
-  console.log('Connected to notification server');
-  socket.emit('join-room');
-});
-
-socket.on('user-joined', (data) => {
-  console.log('Received message:', data);
-  // updateNotificationUI(data);
-});
-socket.on('send-message', (data) => {
-  const dipayTextElement = document.getElementById("dipay-text");
-  console.log('Received message:', data);
-  dipayTextElement.textContent = `Your payment amount is: $${data.data.message}`;
-  // updateNotificationUI(data);
-});
-
-socket.on('error', (error) => {
-  console.error('Socket error:', error);
-});
-
-// UI update function
-function updateNotificationUI(data) {
-  const container = document.getElementById('notification-container');
-  const notification = document.createElement('div');
-  notification.className = 'notification';
-  notification.textContent = data.message;
-  container.appendChild(notification);
-}
     </script>
   </body>
 </html>

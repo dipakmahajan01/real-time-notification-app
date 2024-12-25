@@ -13,8 +13,7 @@ export const sendNotificationPubSub = async () => {
         const messageData = JSON.parse(data);
         const userData = await getUserListFromRedis();
         const socketId =  userData[0].socketId;
-        IO.to(socketId).emit(
-          'send-message',
+        IO.to(socketId).emit('send-message',
           responseGenerators(messageData.data, StatusCodes.OK, 'message successfully send', false),
         );
       }
@@ -24,7 +23,7 @@ export const sendNotificationPubSub = async () => {
   }
 };
 export const socketConnection = async (io: any) => {
-  try {
+  try {                   
     IO = io.of('/v1/notification');
     IO.on('connection', async (socket: any) => {
       console.log('socket connect' + socket.id);
