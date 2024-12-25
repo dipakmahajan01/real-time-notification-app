@@ -17,7 +17,7 @@ The application uses a modular routing system with two main feature areas:
 
 ### 2. Client Interface
 - Located in `/src/view/client.html`
-- Provides the frontend interface for the application
+- Provides the user token manually in header  
 
 ### 3. Application Entry Point
 - `src/index.ts`: Main application entry point that bootstraps the application
