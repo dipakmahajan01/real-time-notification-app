@@ -12,10 +12,13 @@ export const sendNotificationPubSub = async () => {
       if (data) {
         const messageData = JSON.parse(data);
         const userData = await getUserListFromRedis();
-        const socketId =  userData[0].socketId;
-        IO.to(socketId).emit('send-message',
-          responseGenerators(messageData.data, StatusCodes.OK, 'message successfully send', false),
-        );
+        userData.forEach(element => {
+          const socketId =  element.socketId;
+          IO.to(socketId).emit('send-message',
+            responseGenerators(messageData.data, StatusCodes.OK, 'message successfully send', false),
+          );
+          
+        });
       }
     });
   } catch (error: any) {
@@ -57,5 +60,4 @@ export const socketConnection = async (io: any) => {
   } catch (error) {
     return error 
   }
-
 };

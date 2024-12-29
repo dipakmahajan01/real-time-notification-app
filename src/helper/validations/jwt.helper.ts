@@ -12,7 +12,7 @@ const refreshJwtOption = {
   expiresIn: process.env.REFRESH_EXPIRED_IN || '1w',
 };
 export const createJwtToken = (data: ITokenData) => {
-  return sign(data, process.env.SECRET_KEY, jwtOption);
+  return sign(data, process.env.SECRET_KEY);
 };
 export function getJwt(data: ITokenData) {
   return sign(data, process.env.SECRET_KEY, jwtOption);
