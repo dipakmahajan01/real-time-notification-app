@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notification System</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Add Custom CSS -->
+    <style>
+      :root {
+        --primary-color: #4a90e2;
+        --secondary-color: #f5f7fa;
+      }
+
+      body {
+        background-color: var(--secondary-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .notification-container {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .notification-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        padding: 15px;
+        animation: slideIn 0.3s ease-in-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .form-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+      }
+
+      .custom-btn {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 10px 20px;
+        transition: transform 0.2s;
+      }
+
+      .custom-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+      }
+
+      .notification-badge {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--primary-color);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        display: none;
+      }
+
+      .loading-spinner {
+        display: none;
+        margin-left: 10px;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"></script>
+  </head>
+  <body>
+    <div class="notification-badge" id="connectionStatus">Connected</div>
+
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="form-container">
+            <h2 class="text-center mb-4">Send Notification</h2>
+
+            <form id="notificationForm" class="needs-validation" novalidate>
+              <div class="mb-4">
+                <label for="message" class="form-label">Message</label>
+                <textarea
+                  class="form-control"
+                  id="message"
+                  rows="3"
+                  required
+                  placeholder="Enter your notification message..."
+                ></textarea>
+                <div class="invalid-feedback">Please enter a message.</div>
+              </div>
+
+              <div class="mb-4">
+                <label for="timestamp" class="form-label">Schedule Time</label>
+                <input type="datetime-local" class="form-control" id="timestamp" required />
+                <div class="invalid-feedback">Please select a valid date and time.</div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn custom-btn text-white">
+                  Send Notification
+                  <div class="spinner-border spinner-border-sm loading-spinner" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </button>
+              </div>
+            </form>
+
+            <div class="mt-5">
+              <h3 class="mb-3">Recent Notifications</h3>
+              <div class="notification-container" id="notificationContainer">
+                <!-- Notifications will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container for Notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto">Notification</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          <!-- Toast message will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Bootstrap JS and its dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+      const socket = io('https://real-time-notification-app.onrender.com/v1/notification', {
+        transportOptions: {
+          polling: {
+            extraHeaders: {
+              authorization:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImlhdCI6MTczNTU3NzAyOX0.t8GYlN2HUN9FSbTQFAGC5Iw_zUs9gl9A_TPMzcLSOR0',
+            },
+          },
+        },
+      });
+
+      // Show connection status
+      socket.on('connect', () => {
+        const statusBadge = document.getElementById('connectionStatus');
+        statusBadge.style.display = 'block';
+        statusBadge.style.backgroundColor = '#28a745';
+        statusBadge.textContent = 'Connected';
+        socket.emit('join-room');
+      });
+
+      socket.on('disconnect', () => {
+        const statusBadge = document.getElementById('connectionStatus');
+        statusBadge.style.backgroundColor = '#dc3545';
+        statusBadge.textContent = 'Disconnected';
+      });
+
+      socket.on('send-message', (data) => {
+        addNotificationToUI(data);
+        showToast(`New message: ${data.data.message}`);
+      });
+
+      function addNotificationToUI(data) {
+        const container = document.getElementById('notificationContainer');
+        const notificationElement = document.createElement('div');
+        notificationElement.className = 'notification-card';
+
+        const timestamp = new Date(data.data.timestamp).toLocaleString();
+
+        notificationElement.innerHTML = `
+                <h5 class="mb-2">${data.event_type}</h5>
+                <p class="mb-1">${data.data.message}</p>
+                <small class="text-muted">${timestamp}</small>
+            `;
+
+        container.insertBefore(notificationElement, container.firstChild);
+      }
+
+      function showToast(message) {
+        const toastElement = document.getElementById('notificationToast');
+        const toast = new bootstrap.Toast(toastElement);
+        toastElement.querySelector('.toast-body').textContent = message;
+        toast.show();
+      }
+
+      document.getElementById('notificationForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const form = event.target;
+        if (!form.checkValidity()) {
+          event.stopPropagation();
+          form.classList.add('was-validated');
+          return;
+        }
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        const spinner = submitButton.querySelector('.loading-spinner');
+
+        // Show loading state
+        submitButton.disabled = true;
+        spinner.style.display = 'inline-block';
+
+        const message = document.getElementById('message').value;
+        const timestamp = document.getElementById('timestamp').value;
+
+        const data = {
+          user_id: '1',
+          event_type: 'new_message',
+          data: {
+            message: message,
+            timestamp: timestamp,
+          },
+        };
+
+        try {
+          const response = await fetch(
+            'https://real-time-notification-app.onrender.com/api/notification/send-message',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            },
+          );
+
+          const result = await response.json();
+          if (response.ok) {
+            showToast('Notification sent successfully!');
+            form.reset();
+            form.classList.remove('was-validated');
+          } else {
+            showToast(`Error: ${result.message}`);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Failed to send notification.');
+        } finally {
+          // Reset loading state
+          submitButton.disabled = false;
+          spinner.style.display = 'none';
+        }
+      });
+    </script>
+  </body>
+</html>
