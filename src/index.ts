@@ -2,7 +2,7 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { StatusCodes } from 'http-status-codes';
-import { responseGenerators, responseValidation } from './lib';
+import { responseValidation } from './lib';
 import express, { Request, Response } from 'express'; // NextFunction,
 import { createServer } from 'http';
 import helmet from 'helmet';
@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 import { sendNotificationPubSub, socketConnection } from './socket';
 import { Server } from 'socket.io';
 import notificationRoutes from './routes/notification';
-import { createJwtToken } from './helper/validations/jwt.helper';
 import userRoutes from './routes/users';
 dotenv.config();
 const app = express();
