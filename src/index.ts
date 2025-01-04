@@ -18,11 +18,11 @@ const server: any = createServer(app);
 const io = new Server(server, {
   cookie: true,
   cors: {
-    origin: ['https://real-time-notification-app.vercel.app'],
+    origin: ['https://real-time-notification-app.vercel.app', 'http://127.0.0.1:5501'],
     allowedHeaders: ['Authorization'],
     credentials: true,
   },
-});
+}); 
 // add database connection
 
 app.set('io', io);
@@ -56,7 +56,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-sendNotificationPubSub()
+sendNotificationPubSub();
 const health = (req: Request, res: Response) => {
   res.json({
     message: 'real time notification application server is working',
@@ -111,7 +111,7 @@ app.use((req: Request, res: Response) => {
     .send(responseValidation(StatusCodes.INTERNAL_SERVER_ERROR, 'No route found'));
 });
 
-  socketConnection(io);
+socketConnection(io);
 
 process.on('unhandledRejection', function (reason, promise) {
   logger.error('Unhandled rejection', { reason, promise });
