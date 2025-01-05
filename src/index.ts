@@ -18,7 +18,7 @@ const server: any = createServer(app);
 const io = new Server(server, {
   cookie: true,
   cors: {
-    origin: ['https://real-time-notification-app.vercel.app', 'http://127.0.0.1:5501'],
+    origin: ['https://real-time-notification-app.vercel.app','http://localhost:5173', 'http://127.0.0.1:5501'],
     allowedHeaders: ['Authorization'],
     credentials: true,
   },

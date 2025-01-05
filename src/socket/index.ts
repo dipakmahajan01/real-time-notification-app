@@ -5,6 +5,7 @@ import { ERROR, ITokenData } from '../common/global-constants';
 import { getUserListFromRedis, insertUserListOnRedis } from '../helper/user-redis-helper';
 import { subscribeChannel } from '../helper/pub-sub.helper';
 let IO;
+let socketIds = []
 export const sendNotificationPubSub = async () => {
   try {
     const subscriber = await subscribeChannel();
@@ -15,9 +16,8 @@ export const sendNotificationPubSub = async () => {
         userData.forEach(element => {
           const socketId =  element.socketId;
           IO.to(socketId).emit('send-message',
-            responseGenerators(messageData.data, StatusCodes.OK, 'message successfully send', false),
+            responseGenerators({id:socketId,...messageData.data}, StatusCodes.OK, 'message successfully send', false),
           );
-          
         });
       }
     });
@@ -29,9 +29,9 @@ export const socketConnection = async (io: any) => {
   try {                   
     IO = io.of('/v1/notification');
     IO.on('connection', async (socket: any) => {
-      console.log('socket connect' + socket.id);
+       socketIds.push(socket.id);
       const data = await socketAuthenticateUser(socket);
-  
+      console.log('data',data)
       if (!data) {
         return socket.emit(
           'token-verified',
@@ -46,7 +46,7 @@ export const socketConnection = async (io: any) => {
           socketId: socket.id,
         });
         socket.join(socket.id);
-        socket.emit('user-joined', responseGenerators({}, StatusCodes.OK, 'user join successfully', false));
+        socket.emit('user-joined', responseGenerators({id:socket.id}, StatusCodes.OK, 'user join successfully', false));
       });
       // Listen for a custom event from the client
       socket.on('sendNotification', (data) => {
